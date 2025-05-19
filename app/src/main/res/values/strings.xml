@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Living Cost Tracker</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="placeholderinputname">Enter your name</string>
+    <string name="placeholderincome">Income</string>
+</resources>

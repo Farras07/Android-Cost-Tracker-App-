@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="custom_card_component">
+        <!-- Cards Atrrs-->
+        <attr name="cardTitle" format="string" />
+        <attr name="cardContent" format="string" />
+        <attr name="cardContentTextSize" format="dimension" />
+        <attr name="cardIcon" format="reference" />
+        <!-- Header Atrrs-->
+        <attr name="username" format="string" />
+        <attr name="saving" format="integer" />
+
+    </declare-styleable>
+</resources>
