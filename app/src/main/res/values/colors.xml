@@ -9,11 +9,17 @@
     <color name="charcoal">#4A4A4A</color>
     <color name="white">#FFFFFFFF</color>
     <color name="orange">#f0a24f</color>
+    <color name="oldOrange">#EB8314</color>
     <color name="pastel">#eeff00</color>
     <color name="selectedButtonColor">#DB9D00</color>
     <color name="unselectedButtonColor">#FDFBD4</color>
     <color name="basic">#fceee4</color>
     <color name="secondary1">#824606</color>
+    <color name="dust">#dddad8</color>
+    <color name="greenMoney">#228A50</color>
+    <color name="redLips">#ed093b</color>
+
+
 
 
 </resources>

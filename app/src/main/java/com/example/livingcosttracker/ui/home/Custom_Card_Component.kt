@@ -6,6 +6,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.*
 import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import com.example.livingcosttracker.R
 
 class Custom_Card_Component @JvmOverloads constructor(
@@ -42,15 +43,10 @@ class Custom_Card_Component @JvmOverloads constructor(
         }
     }
 
-    fun setCardTitle(text: String) {
-        title.text = text
-    }
-
     fun setCardContent(text: String) {
         content.text = text
     }
-
-    fun setCardIcon(@DrawableRes resId: Int) {
-        icon.setImageResource(resId)
+    fun setTextColor(colorResId: Int, context: Context) {
+        content.setTextColor(ContextCompat.getColor(context, colorResId))
     }
 }

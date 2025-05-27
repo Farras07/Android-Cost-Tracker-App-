@@ -9,6 +9,11 @@
         <!-- Header Atrrs-->
         <attr name="username" format="string" />
         <attr name="saving" format="integer" />
-
+        <!-- Card Cashflow-->
+        <attr name="cardCashflowIcon" format="reference" />
+        <attr name="cardCashflowIconCC" format="string" />
+        <attr name="cardCashflowDesc" format="string" />
+        <attr name="cashflowMoney" format="integer" />
+        <attr name="CardCashflowTitle" format="string" />
     </declare-styleable>
 </resources>

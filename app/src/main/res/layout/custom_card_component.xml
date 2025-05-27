@@ -41,8 +41,9 @@
                 android:layout_height="wrap_content"
                 android:text="Title"
                 android:textColor="@color/basic"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_semibold"/>
 
             <TextView
                 android:id="@+id/infoCardContent"
@@ -51,7 +52,8 @@
                 android:layout_marginTop="8dp"
                 android:text="Content"
                 android:textColor="@color/basic"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_regular"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

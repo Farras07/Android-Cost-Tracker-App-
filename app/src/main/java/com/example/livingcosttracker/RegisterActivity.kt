@@ -59,7 +59,7 @@ class RegisterActivity : AppCompatActivity() {
             val income = inputIncome.text.toString().toIntOrNull()
 
             if(income == null || income == 0) {
-                Toast.makeText(this, "0 Income is not allowed dickhead", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "0 Income is not allowed", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -72,7 +72,7 @@ class RegisterActivity : AppCompatActivity() {
             val savingPercentage = selectedButton.tag.toString().toFloat()
             try {
                 val db = AppDatabase.getDatabase(this)
-                val user = User(username = name, fix_monthly_income = income, savingPercentage = savingPercentage)
+                val user = User(username = name, fix_monthly_income = income, savingPercentage = savingPercentage, balance = 0)
                 CoroutineScope(Dispatchers.IO).launch {
                     db.userDao().insertUser(user)
                 }
