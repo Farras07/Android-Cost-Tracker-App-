@@ -13,6 +13,8 @@
         android:theme="@style/Theme.LivingCostTracker"
         tools:targetApi="31">
         <activity android:name=".MainActivity" />
+        <activity android:name=".AddActivity" />
+        <activity android:name=".CashflowActivity" />
         <activity
             android:name=".RegisterActivity"
             android:exported="true"

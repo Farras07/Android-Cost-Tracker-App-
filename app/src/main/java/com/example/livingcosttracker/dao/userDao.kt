@@ -10,4 +10,11 @@ interface UserDao {
 
     @Query("SELECT * FROM User Where id='1'")
     suspend fun getUser(): User
+
+    @Query("SELECT balance FROM user WHERE id=1")
+    suspend fun getUserBalance(): Int
+
+    @Query("UPDATE user SET balance = :newBalance WHERE id = 1")
+    suspend fun updateUserBalanceById(newBalance: Int)
+
 }

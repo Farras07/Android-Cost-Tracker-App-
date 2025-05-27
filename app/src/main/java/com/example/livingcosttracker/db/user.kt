@@ -7,5 +7,7 @@ data class User(
     @ColumnInfo(name = "username") val username: String,
     @ColumnInfo(name = "fix_monthly_income") val fix_monthly_income: Int,
     @ColumnInfo(name = "savingPercentage") val savingPercentage: Float,
+    @ColumnInfo(name = "balance") val balance: Int,
+
     )
 
