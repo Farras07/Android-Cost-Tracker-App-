@@ -194,12 +194,12 @@ class AddActivity : AppCompatActivity() {
         val datePickerDialog = DatePickerDialog(
             this,
             { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
-                val selectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
-                Toast.makeText(this, "Selected Date: $selectedDate", Toast.LENGTH_SHORT).show()
+                // Save to the class-level variable
+                this.selectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
 
-                // Optionally update button text
+                // Update button text
                 val btnPickDate = findViewById<MaterialButton>(R.id.pickDateButton)
-                btnPickDate.text = selectedDate
+                btnPickDate.text = this.selectedDate
             },
             year,
             month,
@@ -208,6 +208,7 @@ class AddActivity : AppCompatActivity() {
 
         datePickerDialog.show()
     }
+
 }
 
 

@@ -4,6 +4,7 @@ import androidx.room.*
 import com.example.livingcosttracker.db.Cashflow
 import kotlinx.coroutines.flow.Flow
 import java.time.YearMonth
+import java.util.Date
 
 @Dao
 interface CashflowDao {
@@ -26,11 +27,22 @@ interface CashflowDao {
 """)
     suspend fun getBalanceThisMonth(yearMonth: String): Int?
 
-
     @Query("""
     SELECT SUM(total) FROM cashflow 
     WHERE strftime('%Y-%m', date / 1000, 'unixepoch') = :yearMonth 
     AND category = 'Cost'
     """)
     suspend fun getCashflowExpenseByMonth(yearMonth: String): Int?
+
+    @Query("""
+    SELECT DISTINCT strftime('%Y-%m', datetime(date / 1000, 'unixepoch')) AS yearMonth
+    FROM cashflow
+    ORDER BY yearMonth
+    """)
+    suspend fun getYearMonthCashflow(): List<String>
+
+    @Query(""" SELECT * FROM cashflow
+            WHERE strftime('%Y-%m', datetime(date / 1000, 'unixepoch')) = :yearMonth
+    """)
+    suspend fun getCashflowByYearMonth(yearMonth: String): List<Cashflow>
 }

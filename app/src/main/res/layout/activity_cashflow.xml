@@ -1,6 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="270sp"
+        android:layout_marginBottom="20sp"
+        android:orientation="vertical"
+        android:background="@color/oldOrange"
+        android:paddingHorizontal="7sp"
+        android:paddingVertical="10sp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/header_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/infoCards"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/headerTextContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Cashflow On May"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/infoCards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/eader_title">
+
+            <com.example.livingcosttracker.ui.home.Custom_Card_Component
+                android:id="@+id/balanceCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                app:cardContent="Rp. 1.000.000"
+                app:cardContentTextSize="11sp"
+                app:cardIcon="@drawable/wallet"
+                app:cardTitle="Balance"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <com.example.livingcosttracker.ui.home.Custom_Card_Component
+                android:id="@+id/expenseCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardContent="Rp. 2.000.000"
+                app:cardContentTextSize="11sp"
+                app:cardIcon="@drawable/group"
+                app:cardTitle="Expense"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/balanceCard"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cashflowListSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="720sp"
+        android:padding="10sp"
+        app:layout_constraintTop_toBottomOf="@+id/header"
+        android:elevation="7dp"
+        android:translationY="-70sp"
+        android:backgroundTint="@color/unselectedButtonColor"
+        app:cardCornerRadius="50sp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20sp"
+            android:orientation="vertical"
+            android:paddingBottom="60sp">
+            <LinearLayout
+                android:id="@+id/headerCashflowList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="20sp"
+                    android:src="@drawable/rectangleswipe"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cashflow"
+                    android:textSize="20sp"
+                    android:layout_marginTop="30sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textColor="@color/charcoal"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="15sp"
+                android:orientation="horizontal">
+                <HorizontalScrollView
+                    android:id="@+id/filterMonthScroll"
+                    android:layout_width="320sp"
+                    android:layout_height="wrap_content"
+                    android:fillViewport="true"
+                    android:scrollbars="none">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/cashflowFilterSection"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_horizontal"
+                            android:background="@color/unselectedButtonColor">
+
+                            <include
+                                android:id="@+id/mockFilter"
+                                layout="@layout/card_month_filter"/><include
+                                android:id="@+id/mockFilter1"
+                                layout="@layout/card_month_filter"/><include
+                                android:id="@+id/mockFilter2"
+                                layout="@layout/card_month_filter"/><include
+                                android:id="@+id/mockFilter3"
+                                layout="@layout/card_month_filter"/><include
+                                android:id="@+id/mockFilter4"
+                                layout="@layout/card_month_filter"/><include
+                                android:id="@+id/mockFilter5"
+                                layout="@layout/card_month_filter"/>
+                        </LinearLayout>
+                    </FrameLayout>
+                </HorizontalScrollView>
+
+                <LinearLayout
+                    android:id="@+id/search_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/search_icon"/>
+                </LinearLayout>
+
+
+            </LinearLayout>
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:id="@+id/cashflowContentContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15sp"
+                    android:orientation="vertical">
+                    <LinearLayout
+                        android:id="@+id/mockCardCashflowDateCategoryContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="12 March"
+                            android:paddingHorizontal="15sp"
+                            android:paddingVertical="5sp"
+                            android:textSize="15sp"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/poppins_regular"/>
+                        <LinearLayout
+                            android:id="@+id/cashflowListContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <include
+                                layout="@layout/component_card_cashflow"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+
+
+
+
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
