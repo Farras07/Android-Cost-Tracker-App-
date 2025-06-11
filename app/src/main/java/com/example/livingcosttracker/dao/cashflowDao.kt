@@ -45,4 +45,16 @@ interface CashflowDao {
             WHERE strftime('%Y-%m', datetime(date / 1000, 'unixepoch')) = :yearMonth
     """)
     suspend fun getCashflowByYearMonth(yearMonth: String): List<Cashflow>
+
+    @Query("""
+    SELECT * FROM cashflow 
+    WHERE category = :category
+    """)
+    suspend fun getCashflowByCategories(category: String): List<Cashflow>
+
+    @Query("""
+    SELECT * FROM cashflow 
+    WHERE itemCategory = :itemCategory
+    """)
+    suspend fun getCashflowByItemCategories(itemCategory: String): List<Cashflow>
 }
