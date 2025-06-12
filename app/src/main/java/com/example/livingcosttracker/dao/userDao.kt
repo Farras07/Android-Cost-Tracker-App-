@@ -17,4 +17,13 @@ interface UserDao {
     @Query("UPDATE user SET balance = :newBalance WHERE id = 1")
     suspend fun updateUserBalanceById(newBalance: Int)
 
+    @Query("UPDATE user SET username = :username WHERE id = 1")
+    suspend fun updateUsername(username: String)
+
+    @Query("UPDATE user SET fix_monthly_income = :income WHERE id = 1")
+    suspend fun updateUserMonthlyIncome(income: Int)
+
+    @Query("UPDATE user SET savingPercentage = :savingPercent WHERE id = 1")
+    suspend fun updateUserSavingPercentage(savingPercent: Float)
+
 }

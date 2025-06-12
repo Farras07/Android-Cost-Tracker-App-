@@ -23,9 +23,11 @@ import android.widget.Spinner
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.DatePicker
+import com.example.livingcosttracker.converter.Converters
 import com.example.livingcosttracker.db.Cashflow
 import java.util.Calendar
 
@@ -35,7 +37,7 @@ class AddActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add)
-
+        val converters = Converters()
         val mySwitch = findViewById<SwitchCompat>(R.id.mySwitch)
         val categoriesSpinner = findViewById<Spinner>(R.id.categories)
         val itemCategoriesSpinner = findViewById<Spinner>(R.id.itemCategories)
@@ -58,19 +60,28 @@ class AddActivity : AppCompatActivity() {
                 if (isEditing) return
 
                 isEditing = true
-                val text = s.toString()
+                val original = s.toString()
 
-                // Prevent removing "Rp. "
-                if (!text.startsWith("Rp. ")) {
+                // Remove "Rp. " and all non-digit characters
+                val clean = original.replace("Rp. ", "").replace(".", "").trim()
+
+                if (clean.isNotEmpty()) {
+                    try {
+                        val formatted = converters.formatCurrency(clean.toInt())
+                        amountEditText.setText("Rp. $formatted")
+                    } catch (e: NumberFormatException) {
+                        amountEditText.setText("Rp. ")
+                    }
+                } else {
+                    // When all numbers are deleted, keep "Rp. "
                     amountEditText.setText("Rp. ")
                 }
 
-                // Ensure cursor stays at the end
+                // Move cursor to the end
                 amountEditText.setSelection(amountEditText.text.length)
                 isEditing = false
             }
         })
-
 
         val cashflowCategoriesItems = listOf("Categories", "Income", "Cost")
         val itemCategoriesMap = mapOf(
@@ -138,9 +149,25 @@ class AddActivity : AppCompatActivity() {
         submitAddCashflowElement.setOnClickListener() {
             val sharedPref = getSharedPreferences("auth_prefs", MODE_PRIVATE)
             val userId = sharedPref.getInt("userId",1)
-            val total = findViewById<EditText>(R.id.inputMoney).text.toString().replace("Rp. ", "").toInt()
+
+            val incomeString = amountEditText.text.toString()
+            Log.d("income", incomeString.toString())
+            if(incomeString == "Rp. ") {
+                Toast.makeText(this, "Please Fill Total Money!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val total = incomeString.replace("Rp. ", "")
+                .replace(".", "")
+                .toInt()
+
             var category = findViewById<Spinner>(R.id.categories).selectedItem.toString()
             var itemCategory = findViewById<Spinner>(R.id.itemCategories).selectedItem.toString()
+
+            if (category == "Categories" && itemCategory == "Item Categories") {
+                Toast.makeText(this, "Please Fill Cashflow Categories!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             var description = findViewById<EditText>(R.id.inputDescription).text.toString()
             val dateString = selectedDate ?: ""
             val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())

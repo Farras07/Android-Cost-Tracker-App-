@@ -51,17 +51,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navView: BottomNavigationView = binding.navView
-
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
-        val navController = navHostFragment.navController
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_home, R.id.navigation_notifications
-            )
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        val profileButton = findViewById<LinearLayout>(R.id.profileButton)
+        profileButton.setOnClickListener() {
+            val navToProfile = Intent(this, ProfileActivity::class.java)
+            startActivity(navToProfile)  // Start the activity
+        }
 
         val cardAddElement = findViewById<FloatingActionButton>(R.id.addCashflowButton)
         cardAddElement.setOnClickListener(){

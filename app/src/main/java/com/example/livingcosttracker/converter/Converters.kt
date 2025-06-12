@@ -31,4 +31,8 @@ class Converters {
         val formatter = NumberFormat.getInstance(Locale("in", "ID"))
         return "Rp. ${formatter.format(amount)}"
     }
+
+    fun formatCurrency(amount: Int): String {
+        return String.format("%,d", amount).replace(",", ".")
+    }
 }

@@ -122,7 +122,7 @@
                 android:orientation="horizontal">
                 <HorizontalScrollView
                     android:id="@+id/filterMonthScroll"
-                    android:layout_width="320sp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fillViewport="true"
                     android:scrollbars="none">
@@ -142,30 +142,20 @@
 
                             <include
                                 android:id="@+id/mockFilter"
-                                layout="@layout/card_month_filter"/><include
-                                android:id="@+id/mockFilter1"
-                                layout="@layout/card_month_filter"/><include
-                                android:id="@+id/mockFilter2"
-                                layout="@layout/card_month_filter"/><include
-                                android:id="@+id/mockFilter3"
-                                layout="@layout/card_month_filter"/><include
-                                android:id="@+id/mockFilter4"
-                                layout="@layout/card_month_filter"/><include
-                                android:id="@+id/mockFilter5"
                                 layout="@layout/card_month_filter"/>
                         </LinearLayout>
                     </FrameLayout>
                 </HorizontalScrollView>
 
-                <LinearLayout
-                    android:id="@+id/search_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/search_icon"/>
-                </LinearLayout>
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/search_button"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent">-->
+<!--                    <ImageView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:src="@drawable/search_icon"/>-->
+<!--                </LinearLayout>-->
 
 
             </LinearLayout>

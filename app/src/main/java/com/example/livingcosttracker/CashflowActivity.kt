@@ -50,11 +50,11 @@
             val mockFilterCard = findViewById<LinearLayout>(R.id.mockFilter)
             mockFilterCard.visibility = View.GONE
 
-            val cashflowSearch = findViewById<LinearLayout>(R.id.search_button)
-            cashflowSearch.setOnClickListener(){
-                val navToSearchPage = Intent(this, SearchActivity::class.java)
-                startActivity(navToSearchPage)  // Start the activity
-            }
+//            val cashflowSearch = findViewById<LinearLayout>(R.id.search_button)
+//            cashflowSearch.setOnClickListener(){
+//                val navToSearchPage = Intent(this, SearchActivity::class.java)
+//                startActivity(navToSearchPage)  // Start the activity
+//            }
 
 
             val cashflowSectionView = findViewById<CardView>(R.id.cashflowListSection)
