@@ -3,7 +3,7 @@ import com.example.livingcosttracker.converter.Converters
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import androidx.lifecycle.lifecycleScope
-
+import androidx.navigation.findNavController
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +20,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.example.livingcosttracker.databinding.ActivityMainBinding
 import com.example.livingcosttracker.db.AppDatabase
 import com.example.livingcosttracker.db.User
@@ -32,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 import com.example.livingcosttracker.ui.home.HeaderInfoUser
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.Calendar
 import kotlin.math.roundToInt
 
@@ -44,6 +50,19 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val navView: BottomNavigationView = binding.navView
+
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
+        val navController = navHostFragment.navController
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.navigation_home, R.id.navigation_notifications
+            )
+        )
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
+
         val cardAddElement = findViewById<FloatingActionButton>(R.id.addCashflowButton)
         cardAddElement.setOnClickListener(){
             val navToAddCashflow = Intent(this, AddActivity::class.java)
@@ -51,18 +70,7 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-//        val navView: BottomNavigationView = binding.navView
 
-//        val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-//        val appBarConfiguration = AppBarConfiguration(
-//            setOf(
-//                R.id.navigation_home, R.id.navigation_notifications
-//            )
-//        )
-//        setupActionBarWithNavController(navController, appBarConfiguration)
-//        navView.setupWithNavController(navController)
         val headerCashflowCardContainer = findViewById<FrameLayout>(R.id.headerCashflowCardContainer)
         headerCashflowCardContainer.setOnClickListener() {
             val navToCashflowActivity = Intent(this, CashflowActivity::class.java)
