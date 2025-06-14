@@ -1,4 +1,5 @@
 package com.example.livingcosttracker
+
 import com.example.livingcosttracker.converter.Converters
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -19,7 +20,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
@@ -38,7 +38,10 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import com.example.livingcosttracker.ui.home.HeaderInfoUser
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
@@ -47,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -69,8 +73,8 @@ class MainActivity : AppCompatActivity() {
         headerCashflowCardContainer.setOnClickListener() {
             val navToCashflowActivity = Intent(this, CashflowActivity::class.java)
             startActivity(navToCashflowActivity)  // Start the activity
-        }
 
+        }
         lifecycleScope.launch {
             val calendar = Calendar.getInstance()
             val converters = Converters()
@@ -132,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 
             savingCard.setCardContent(userSavingFormatted)
             if (userSaving > balanceThisMonth) {
-                savingCard.setTextColor(R.color.redLips, this@MainActivity) // `this` is the context (e.g., Activity)
+                savingCard.setTextColor(R.color.redLips, this@MainActivity) // this is the context (e.g., Activity)
 
             }
             val moneyToSpendFormatted = converters.formatRupiah(moneyToSpend)
@@ -154,7 +158,19 @@ class MainActivity : AppCompatActivity() {
                 val highlightsCashflow = cashflowList.take(3)
                 highlightsCashflow.forEach { item ->
                     val cardView = inflater.inflate(R.layout.component_card_cashflow, cashflowContainerCards, false)
-                    cardView.id = item.id
+                    cardView.setOnClickListener {
+                        val navToEditTransaction = Intent(this@MainActivity, EditTransactionActivity::class.java).apply {
+                            putExtra("id", item.id)
+                            putExtra("amount", item.total.toString())
+                            //putExtra("category", item.category)
+                            putExtra("itemCategory", item.itemCategory)
+                            putExtra("date", SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.date))
+                            putExtra("description", item.description)
+                            putExtra("type", item.category)
+                        }
+                        startActivity(navToEditTransaction)
+                    }
+                    // cardView.id = item.id
                     val cardTitle = cardView.findViewById<TextView>(R.id.cardCashlowTitleText)
                     val cardTotal = cardView.findViewById<TextView>(R.id.cardCashlowTotalText)
                     val cardDesc = cardView.findViewById<TextView>(R.id.cardCashlowDescText)
@@ -181,12 +197,11 @@ class MainActivity : AppCompatActivity() {
                     if (item.category != "Income") {
                         cardIcon.setImageResource(R.drawable.group)
                     }
+                    // else { cardIcon.setImageResource(R.drawable.your_income_icon); }
+
                     cashflowContainerCards.addView(cardView)
                 }
             }
-
-
         }
     }
-
 }

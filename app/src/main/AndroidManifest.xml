@@ -17,6 +17,7 @@
         <activity android:name=".CashflowActivity" />
         <activity android:name=".SearchActivity" />
         <activity android:name=".ProfileActivity" />
+        <activity android:name=".EditTransactionActivity" />
 
 
         <activity

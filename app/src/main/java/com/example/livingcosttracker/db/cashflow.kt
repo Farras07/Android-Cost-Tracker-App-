@@ -14,7 +14,7 @@ import java.util.Date
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index(value = ["idUser"])]  // recommended for foreign keys
+    indices = [Index(value = ["idUser"])]
 )
 
 data class Cashflow (
@@ -25,4 +25,9 @@ data class Cashflow (
     @ColumnInfo(name = "description") val description: String,
     @ColumnInfo(name = "date") val date: Date,
     @ColumnInfo(name = "idUser") val idUser: Int,
-)
+) {
+    val amount: Any
+        get() {
+            TODO()
+        }
+}
