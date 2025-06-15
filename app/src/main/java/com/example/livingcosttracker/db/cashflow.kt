@@ -25,9 +25,6 @@ data class Cashflow (
     @ColumnInfo(name = "description") val description: String,
     @ColumnInfo(name = "date") val date: Date,
     @ColumnInfo(name = "idUser") val idUser: Int,
-) {
-    val amount: Any
-        get() {
-            TODO()
-        }
-}
+
+
+    )

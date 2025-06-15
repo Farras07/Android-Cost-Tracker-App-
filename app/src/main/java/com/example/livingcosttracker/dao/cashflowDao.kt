@@ -63,4 +63,7 @@ interface CashflowDao {
         WHERE id = :id
     """)
     suspend fun deleteCashflowById(id: String)
+
+    @Update
+    suspend fun updateCashflow(cashflow: Cashflow): Int
 }

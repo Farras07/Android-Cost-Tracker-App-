@@ -10,8 +10,13 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.livingcosttracker.db.Cashflow
+import androidx.lifecycle.lifecycleScope
 import com.example.livingcosttracker.db.AppDatabase
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -20,7 +25,8 @@ import java.util.*
 
 class EditTransactionActivity : AppCompatActivity() {
 
-    private lateinit var etAmount: TextInputEditText
+
+    private lateinit var etTotal: TextInputEditText
     private lateinit var cashflowCategorySpinner: Spinner
     private lateinit var spinnerItemCategory: Spinner
     private lateinit var etDate: TextInputEditText
@@ -28,12 +34,18 @@ class EditTransactionActivity : AppCompatActivity() {
     private lateinit var btnSave: Button
     private lateinit var btnCancel: Button
 
+
+    private var originalCashflowType: String? = null
+    private var originalItemCategory: String? = null
+    private var transactionId: Int = -1
+    private var idUser: Int = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_transaction)
 
-        // Bind views
-        etAmount = findViewById(R.id.etAmount)
+
+        etTotal = findViewById(R.id.etTotal)
         cashflowCategorySpinner = findViewById(R.id.cashlowCategorySpinner)
         spinnerItemCategory = findViewById(R.id.spinnerItemCategory)
         etDate = findViewById(R.id.etDate)
@@ -45,14 +57,25 @@ class EditTransactionActivity : AppCompatActivity() {
         val amountString = intent.getStringExtra("amount")
         val CashflowCategoryType = intent.getStringExtra("type")
         val itemcategory = intent.getStringExtra("itemCategory")
+        val totalStringFromIntent = intent.getStringExtra("total")
+        originalCashflowType = intent.getStringExtra("category")
+        originalItemCategory = intent.getStringExtra("itemCategory")
         val date = intent.getStringExtra("date")
         val description = intent.getStringExtra("description")
-        val transactionId = intent.getIntExtra("id", -1)
+        transactionId = intent.getIntExtra("id", -1)
+        idUser = intent.getIntExtra("idUser", -1)
 
         val db = AppDatabase.getDatabase(this)
 
 
-        etAmount.setText(amountString)
+        if (idUser == -1) {
+            Toast.makeText(this, "ID Pengguna tidak ditemukan. Gagal memuat data.", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        val cleanTotalString = totalStringFromIntent?.replace("Rp. ", "")?.replace(".", "")?.replace(",", ".")
+        etTotal.setText(cleanTotalString)
         etDate.setText(date)
         etDescription.setText(description)
 
@@ -62,115 +85,140 @@ class EditTransactionActivity : AppCompatActivity() {
             "Income" to listOf("Salary", "Freelance" ,"Others"),
             "Cost" to listOf("Food&Drink", "Rent", "Transportation","Investment","Others")
         )
-        val adapter = object : ArrayAdapter<String>(
-            this,
-            android.R.layout.simple_spinner_item,
-            cashflowCategories
-        ) {
-            override fun isEnabled(position: Int): Boolean {
-                return position != 0 // Disable first (placeholder)
-            }
 
+        val cashflowCategoryAdapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, cashflowCategories) {
+            override fun isEnabled(position: Int) = position != 0
             override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = super.getDropDownView(position, convertView, parent)
-                val textView = view as TextView
-                textView.setTextColor(if (position == 0) Color.GRAY else Color.BLACK)
+                (view as TextView).setTextColor(if (position == 0) Color.GRAY else Color.BLACK)
                 return view
             }
         }
+        cashflowCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        cashflowCategorySpinner.adapter = cashflowCategoryAdapter
 
-        val indexCurrentCategories = cashflowCategories.indexOf(CashflowCategoryType)
-        if (indexCurrentCategories == -1) {
-            Toast.makeText(this, "index categories not found", Toast.LENGTH_SHORT).show()
+        val initialCashflowCategoryIndex = cashflowCategories.indexOf(originalCashflowType)
+        if (initialCashflowCategoryIndex != -1) {
+            cashflowCategorySpinner.setSelection(initialCashflowCategoryIndex)
+        } else {
+            cashflowCategorySpinner.setSelection(0)
         }
 
-        var currentItems = itemCategoriesMap[cashflowCategories.getOrNull(indexCurrentCategories)]?.toMutableList() ?: mutableListOf()
-        val itemCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, currentItems)
+
+        val initialItemCategoryList = itemCategoriesMap[originalCashflowType]?.toMutableList() ?: mutableListOf("Item Categories")
+        val itemCategoryAdapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, initialItemCategoryList) {
+            override fun isEnabled(position: Int) = position != 0
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent)
+                (view as TextView).setTextColor(if (position == 0) Color.GRAY else Color.BLACK)
+                return view
+            }
+        }
         itemCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        cashflowCategorySpinner.adapter = adapter
-        cashflowCategorySpinner.setSelection(indexCurrentCategories)
         spinnerItemCategory.adapter = itemCategoryAdapter
+
+        val initialItemCategoryIndex = initialItemCategoryList.indexOf(originalItemCategory)
+        if (initialItemCategoryIndex != -1) {
+            spinnerItemCategory.setSelection(initialItemCategoryIndex)
+        } else {
+            spinnerItemCategory.setSelection(0)
+        }
 
         cashflowCategorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedCategory = cashflowCategories[position]
-                val newItems = itemCategoriesMap[selectedCategory]?.toMutableList() ?: mutableListOf()
+                val newItems = itemCategoriesMap[selectedCategory]?.toMutableList() ?: mutableListOf("Item Categories")
 
                 itemCategoryAdapter.clear()
                 itemCategoryAdapter.addAll(newItems)
                 itemCategoryAdapter.notifyDataSetChanged()
-                val itemIndex = currentItems.indexOf(itemcategory)
-                spinnerItemCategory.setSelection(itemIndex)
 
-                if (itemIndex == -1) {
+                if (selectedCategory == originalCashflowType) {
+                    val index = newItems.indexOf(originalItemCategory)
+                    if (index != -1) {
+                        spinnerItemCategory.setSelection(index)
+                    } else {
+                        spinnerItemCategory.setSelection(0)
+                    }
+                } else {
                     spinnerItemCategory.setSelection(0)
                 }
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // Optional: handle no selection
-            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
         etDate.setOnClickListener {
             val calendar = Calendar.getInstance()
-            val existingDateText = etDate.text.toString()
-            if (existingDateText.isNotEmpty()) {
+            if (etDate.text.toString().isNotEmpty()) {
                 try {
                     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    calendar.time = sdf.parse(existingDateText) ?: calendar.time
+                    calendar.time = sdf.parse(etDate.text.toString()) ?: calendar.time
                 } catch (e: Exception) {
+                    Log.e("EditTransactionActivity", "Error parsing existing date: ${e.message}")
                 }
             }
 
-            val datePicker = DatePickerDialog(this,
-                { _, year, month, day ->
-                    val selectedDate = Calendar.getInstance()
-                    selectedDate.set(year, month, day)
-                    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    etDate.setText(sdf.format(selectedDate.time))
-                },
-                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
-            )
+            val datePicker = DatePickerDialog(this, { _, year, month, day ->
+                val selectedDate = Calendar.getInstance()
+                selectedDate.set(year, month, day)
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                etDate.setText(sdf.format(selectedDate.time))
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
             datePicker.show()
         }
 
         btnSave.setOnClickListener {
-            val newAmountString = etAmount.text.toString()
-            val newCategory = spinnerItemCategory.selectedItem.toString()
-            val newDate = etDate.text.toString()
-            val newDescription = etDescription.text.toString()
+            val newTotalString = etTotal.text?.toString().orEmpty()
+            val newCashflowType = cashflowCategorySpinner.selectedItem?.toString().orEmpty()
+            val newItemCategory = spinnerItemCategory.selectedItem?.toString().orEmpty()
+            val newDateString = etDate.text?.toString().orEmpty()
+            val newDescription = etDescription.text?.toString().orEmpty()
 
-            val newAmountDouble = newAmountString.replace("Rp. ", "").replace(".", "").toDoubleOrNull() // Hapus format Rp. dan titik sebelum konversi
+            val cleanedTotalString = newTotalString.replace("Rp. ", "").replace(".", "").replace(",", ".")
+            val newTotalDouble = cleanedTotalString.toDoubleOrNull()
 
-            if (newAmountDouble == null) {
-                Toast.makeText(this, "Jumlah tidak valid", Toast.LENGTH_SHORT).show()
+            if (newTotalDouble == null || newTotalDouble <= 0) {
+                Toast.makeText(this, "Total Invalid", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            if (newCategory.isBlank() || newDate.isBlank()) {
-                Toast.makeText(this, "Mohon lengkapi semua bidang wajib", Toast.LENGTH_SHORT).show()
+
+            val newTotalInt = newTotalDouble.toInt()
+
+            if (newCashflowType == "Categories" || newItemCategory == "Item Categories" || newDateString.isBlank()) {
+                Toast.makeText(this, "Fill All!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (transactionId != -1) {
-                Toast.makeText(this, "Update clicked for ID: $transactionId", Toast.LENGTH_SHORT).show()
+                lifecycleScope.launch {
+                    try {
+                        val parsedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(newDateString) ?: Date()
 
-                // val updatedCashflow = CashflowActivity(
-                //     id = transactionId,
-                //     amount = newAmountDouble,
-                //     // type = newType,
-                //     category = newCategory,
-                //     itemCategory = newCategory,
-                //     date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(newDate) ?: Date(),
-                //     description = newDescription
-                // )
-                // CashflowDao.update(updatedCashflow)
-                // finish()
+                        val updatedCashflow = Cashflow(
+                            id = transactionId,
+                            idUser = idUser,
+                            total = newTotalInt,
+                            category = newCashflowType,
+                            itemCategory = newItemCategory,
+                            date = parsedDate,
+                            description = newDescription
+                        )
+
+                        db.cashflowDao().updateCashflow(updatedCashflow)
+
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@EditTransactionActivity, "Successfully Updated!", Toast.LENGTH_SHORT).show()
+                            finish()
+                        }
+                    } catch (e: Exception) {
+                        Log.e("EditTransactionActivity", "Failed to Update Transaction: ${e.message}", e)
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@EditTransactionActivity, "Failed to Update Transaction: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             } else {
-                Toast.makeText(this, "ID transaksi tidak ditemukan", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "ID Transaction Not Found", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -189,7 +237,7 @@ class EditTransactionActivity : AppCompatActivity() {
                 }
 
             } else {
-                Toast.makeText(this, "ID transaksi tidak ditemukan", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "ID Transaction Not Found", Toast.LENGTH_SHORT).show()
             }
         }
     }
