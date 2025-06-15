@@ -161,12 +161,16 @@ class MainActivity : AppCompatActivity() {
                     cardView.setOnClickListener {
                         val navToEditTransaction = Intent(this@MainActivity, EditTransactionActivity::class.java).apply {
                             putExtra("id", item.id)
-                            putExtra("amount", item.total.toString())
-                            //putExtra("category", item.category)
+                            putExtra("total", item.total.toString())
+                            putExtra("category", item.category)
                             putExtra("itemCategory", item.itemCategory)
                             putExtra("date", SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.date))
                             putExtra("description", item.description)
                             putExtra("type", item.category)
+
+                            val userInfoState = getSharedPreferences("auth_prefs", MODE_PRIVATE)
+                            val userId = userInfoState.getInt("userId", -1)
+                            putExtra("idUser", userId)
                         }
                         startActivity(navToEditTransaction)
                     }

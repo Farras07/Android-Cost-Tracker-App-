@@ -19,17 +19,17 @@ class CashflowAdapter(
 ) : RecyclerView.Adapter<CashflowAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvAmount: TextView = itemView.findViewById(R.id.cardCashlowTotalText)
+        val tvTotal: TextView = itemView.findViewById(R.id.cardCashlowTotalText)
         val tvCategory: TextView = itemView.findViewById(R.id.cardCashlowTitleText)
         val tvDate: TextView = itemView.findViewById(R.id.pickDateButton)
-        //val tvDesc: TextView = itemView.findViewById(R.id.)
+
         init {
             itemView.setOnClickListener {
                 val transaction = transactions[adapterPosition]
 
                 val intent = Intent(context, EditTransactionActivity::class.java)
                 intent.putExtra("id", transaction.id)
-                intent.putExtra("amount", transaction.amount.toString())
+                intent.putExtra("total", transaction.total.toString())
                 intent.putExtra("category", transaction.category)
                 intent.putExtra("itemCategory", transaction.itemCategory)
                 intent.putExtra("date", formatDate(transaction.date))
@@ -46,7 +46,7 @@ class CashflowAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val transaction = transactions[position]
-        holder.tvAmount.text = "Rp. ${transaction.amount.toString()}"
+        holder.tvTotal.text = "Total: Rp. ${transaction.total}"
         holder.tvCategory.text = "${transaction.category} - ${transaction.itemCategory}"
         holder.tvDate.text = formatDate(transaction.date)
     }

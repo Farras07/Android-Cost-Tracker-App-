@@ -43,7 +43,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etAmount"
+            android:id="@+id/etTotal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
@@ -59,15 +59,15 @@
         android:textStyle="bold"
         android:layout_marginBottom="8dp"/>
 
-    <EditText
-        android:id="@+id/edittype"
+    <Spinner
+        android:id="@+id/cashlowCategorySpinner"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@null"
-        android:ems="10"
-        android:inputType="text"
-        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
-
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:spinnerMode="dropdown"
+        android:layout_marginBottom="16dp"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
         android:layout_marginBottom="8dp"/>
 
     <Spinner
-        android:id="@+id/spinnerCategory"
+        android:id="@+id/spinnerItemCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
