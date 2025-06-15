@@ -44,19 +44,27 @@
 
             val mockCardCashflowList = findViewById<LinearLayout>(R.id.mockCardCashflowDateCategoryContainer)
             mockCardCashflowList.visibility = View.GONE
-            val converters = Converters()
 
 
             val mockFilterCard = findViewById<LinearLayout>(R.id.mockFilter)
             mockFilterCard.visibility = View.GONE
-
 //            val cashflowSearch = findViewById<LinearLayout>(R.id.search_button)
 //            cashflowSearch.setOnClickListener(){
 //                val navToSearchPage = Intent(this, SearchActivity::class.java)
 //                startActivity(navToSearchPage)  // Start the activity
 //            }
 
+        }
 
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun onResume() {
+            super.onResume()
+            refreshCashflowData()
+        }
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        private fun refreshCashflowData() {
+            val converters = Converters()
             val cashflowSectionView = findViewById<CardView>(R.id.cashflowListSection)
             val cashflowFilterSectionView = findViewById<LinearLayout>(R.id.cashflowFilterSection)
             val inflater = LayoutInflater.from(this)
@@ -64,6 +72,7 @@
             val headerTextElement = findViewById<TextView>(R.id.headerTextContent)
             val expenseCard = findViewById<Custom_Card_Component>(R.id.expenseCard)
             val balanceCard = findViewById<Custom_Card_Component>(R.id.balanceCard)
+            val infoCardText =findViewById<TextView>(R.id.infoCardText)
 
             val filterMonthScroll = findViewById<HorizontalScrollView>(R.id.filterMonthScroll)
             filterMonthScroll.post {
@@ -75,124 +84,153 @@
 
             lifecycleScope.launch{
                 val filter: String? = intent.getStringExtra("filterType")
-                if (filter != null) {
-
-                }
-                else {
+                if(filter == null) {
                     val db = AppDatabase.getDatabase(this@CashflowActivity)
                     val yearMonthsList = db.cashflowDao().getYearMonthCashflow()
-                    val currentDate = LocalDate.now()
-                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM")
-                    val formattedDate = currentDate.format(formatter)
-
-                    yearMonthsList.forEach{ yearMonth ->
-                        val filterMonthCard = inflater.inflate(R.layout.card_month_filter, cashflowFilterSectionView, false)
-                        filterMonthCard.setTag(R.id.textFilterMonth, yearMonth)
-
-                        val monthName = getOnlyRealMonthName(yearMonth, "MM-dd")
-                        val textMonthSection = filterMonthCard.findViewById<TextView>(R.id.textFilterMonth)
-                        textMonthSection.text = monthName
-                        textMonthSection.setTypeface(null, Typeface.BOLD)
-
-                        filterMonthCard.setOnClickListener { view ->
-                            val tag = view.getTag(R.id.textFilterMonth) as String
-                            val formattedMonthYear = changeYearMonthToMonthYear(tag)
-                            headerTextElement.text = "Cashflow On $formattedMonthYear"
-
-                            selectedFilterCard?.setBackgroundColor(android.graphics.Color.TRANSPARENT)
-
-                            selectedFilterCard = view
-                            view.setBackgroundColor(ContextCompat.getColor(this@CashflowActivity, R.color.orange)) // or any highlight
-
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                val cashflowList = db.cashflowDao().getCashflowByYearMonth(tag)
-                                var totalExpense = 0
-                                var balance = 0
-
-                                cashflowList.forEach{ cashflow ->
-                                    if(cashflow.category == "Cost") {
-                                        totalExpense += cashflow.total
-                                        balance -= cashflow.total
-                                    }
-                                    else balance += cashflow.total
-
-                                }
-                                val totalExpenseFormatted = converters.formatRupiah(totalExpense)
-                                val balanceFormatted = converters.formatRupiah(balance)
-
-                                val sortedCashflows = cashflowList.sortedBy { it.date }
-                                var previousFormattedDate: String? = null
-
-
-                                withContext(Dispatchers.Main) {
-                                    cashflowListContainerElement.removeAllViewsInLayout()
-                                    expenseCard.setCardContent(totalExpenseFormatted)
-                                    balanceCard.setCardContent(balanceFormatted)
-                                }
-                                sortedCashflows.forEach{cashflow ->
-                                    withContext(Dispatchers.Main) {
-                                        val currentFormattedDate = SimpleDateFormat("dd MMMM", Locale.ENGLISH).format(cashflow.date)
-                                        val cashflowListContainer = inflater.inflate(R.layout.component_card_cashflow_list, cashflowListContainerElement, false)
-                                        val cardDate = cashflowListContainer.findViewById<TextView>(R.id.cashflowCardDateText)
-
-                                        cardDate.text = currentFormattedDate
-                                        cashflowListContainerElement.addView(cashflowListContainer)
-
-                                        if (currentFormattedDate == previousFormattedDate) cardDate.visibility = View.GONE
-                                        else cardDate.visibility = View.VISIBLE
-
-                                        previousFormattedDate = currentFormattedDate
-
-
-
-
-                                        val cashflowCardListContainerElement = cashflowListContainer.findViewById<LinearLayout>(R.id.cashflowCardListContainer)
-                                        val cashflowCardListContainer = inflater.inflate(R.layout.component_card_cashflow, cashflowCardListContainerElement, false)
-
-                                        val cardTitle = cashflowCardListContainer.findViewById<TextView>(R.id.cardCashlowTitleText)
-                                        val cardTotal = cashflowCardListContainer.findViewById<TextView>(R.id.cardCashlowTotalText)
-                                        val cardDesc = cashflowCardListContainer.findViewById<TextView>(R.id.cardCashlowDescText)
-                                        val cardItemCategory = cashflowCardListContainer.findViewById<TextView>(R.id.cardCashlowCategoryText)
-                                        val cardIcon = cashflowCardListContainer.findViewById<ImageView>(R.id.cardCashlowIcon)
-
-                                        cardTitle.text = "${cashflow.category}"
-                                        cardItemCategory.text = "${cashflow.itemCategory}"
-                                        val totalFormatted = converters.formatRupiah(cashflow.total)
-
-                                        if (cashflow.category != "Income") {
-                                            cardTotal.text = "-${totalFormatted}"
-                                            cardTotal.setTextColor(ContextCompat.getColor(this@CashflowActivity, R.color.redLips))
-                                        }
-                                        else {
-                                            cardTotal.text = "+${totalFormatted}"
-                                            cardTotal.setTextColor(ContextCompat.getColor(this@CashflowActivity, R.color.greenMoney))
-                                        }
-
-                                        if (cashflow.description == "") cardDesc.text = "No desc"
-                                        else cardDesc.text = "${cashflow.description}"
-
-
-                                        if (cashflow.category != "Income") {
-                                            cardIcon.setImageResource(R.drawable.group)
-                                        }
-
-                                        cashflowCardListContainerElement.addView(cashflowCardListContainer)
-
-
-                                    }
-                                }
-
-
-                            }
-                        }
-                        if (yearMonth == formattedDate) {
-                            filterMonthCard.performClick()
-                        }
-
-                        cashflowFilterSectionView.addView(filterMonthCard)
+                    withContext(Dispatchers.Main) {
+                        headerTextElement.text = "Detail Cashflow"
+                        balanceCard.setCardContent("Rp. 0")
+                        expenseCard.setCardContent("Rp. 0")
+                        cashflowFilterSectionView.removeAllViews()
+                        cashflowListContainerElement.removeAllViews()
                     }
+                    if(yearMonthsList.isEmpty()) {
+                        return@launch
+                    } else {
+                        val currentDate = LocalDate.now()
+                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM")
+                        val formattedDate = currentDate.format(formatter)
 
+                        withContext(Dispatchers.Main) {
+                            cashflowFilterSectionView.removeAllViewsInLayout()
+                        }
+                        yearMonthsList.forEach{ yearMonth ->
+                            val filterMonthCard = inflater.inflate(R.layout.card_month_filter, cashflowFilterSectionView, false)
+                            filterMonthCard.setTag(R.id.textFilterMonth, yearMonth)
+
+                            val monthName = getOnlyRealMonthName(yearMonth, "MM-dd")
+                            val textMonthSection = filterMonthCard.findViewById<TextView>(R.id.textFilterMonth)
+                            textMonthSection.text = monthName
+                            textMonthSection.setTypeface(null, Typeface.BOLD)
+
+                            filterMonthCard.setOnClickListener { view ->
+                                val tag = view.getTag(R.id.textFilterMonth) as String
+                                val formattedMonthYear = changeYearMonthToMonthYear(tag)
+                                headerTextElement.text = "Cashflow On $formattedMonthYear"
+
+                                selectedFilterCard?.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+
+                                selectedFilterCard = view
+                                view.setBackgroundColor(ContextCompat.getColor(this@CashflowActivity, R.color.orange)) // or any highlight
+
+                                lifecycleScope.launch(Dispatchers.IO) {
+                                    val cashflowList = db.cashflowDao().getCashflowByYearMonth(tag)
+                                    var totalExpense = 0
+                                    var balance = 0
+
+                                    cashflowList.forEach{ cashflow ->
+                                        if(cashflow.category == "Cost") {
+                                            totalExpense += cashflow.total
+                                            balance -= cashflow.total
+                                        }
+                                        else balance += cashflow.total
+
+                                    }
+                                    val totalExpenseFormatted = converters.formatRupiah(totalExpense)
+                                    val balanceFormatted = converters.formatRupiah(balance)
+
+                                    val sortedCashflows = cashflowList.sortedBy { it.date }
+                                    var previousFormattedDate: String? = null
+
+
+                                    withContext(Dispatchers.Main) {
+                                        cashflowListContainerElement.removeAllViewsInLayout()
+                                        expenseCard.setCardContent(totalExpenseFormatted)
+                                        balanceCard.setCardContent(balanceFormatted)
+                                    }
+                                    sortedCashflows.forEach{cashflow ->
+                                        withContext(Dispatchers.Main) {
+                                            val currentFormattedDate = SimpleDateFormat("dd MMMM", Locale.ENGLISH).format(cashflow.date)
+                                            val cashflowListContainer = inflater.inflate(R.layout.component_card_cashflow_list, cashflowListContainerElement, false)
+                                            val cardDate = cashflowListContainer.findViewById<TextView>(R.id.cashflowCardDateText)
+
+                                            cardDate.text = currentFormattedDate
+                                            cashflowListContainerElement.addView(cashflowListContainer)
+
+                                            if (currentFormattedDate == previousFormattedDate) cardDate.visibility = View.GONE
+                                            else cardDate.visibility = View.VISIBLE
+
+                                            previousFormattedDate = currentFormattedDate
+
+
+
+
+                                            val cashflowCardListContainerElement = cashflowListContainer.findViewById<LinearLayout>(R.id.cashflowCardListContainer)
+                                            val cashflowCardListContainer = inflater.inflate(R.layout.component_card_cashflow, cashflowCardListContainerElement, false)
+
+                                            val cardTitle = cashflowCardListContainer.findViewById<TextView>(R.id.cardCashlowTitleText)
+                                            val cardTotal = cashflowCardListContainer.findViewById<TextView>(R.id.cardCashlowTotalText)
+                                            val cardDesc = cashflowCardListContainer.findViewById<TextView>(R.id.cardCashlowDescText)
+                                            val cardItemCategory = cashflowCardListContainer.findViewById<TextView>(R.id.cardCashlowCategoryText)
+                                            val cardIcon = cashflowCardListContainer.findViewById<ImageView>(R.id.cardCashlowIcon)
+
+                                            cardTitle.text = "${cashflow.category}"
+                                            cardItemCategory.text = "${cashflow.itemCategory}"
+                                            val totalFormatted = converters.formatRupiah(cashflow.total)
+
+                                            if (cashflow.category != "Income") {
+                                                cardTotal.text = "-${totalFormatted}"
+                                                cardTotal.setTextColor(ContextCompat.getColor(this@CashflowActivity, R.color.redLips))
+                                            }
+                                            else {
+                                                cardTotal.text = "+${totalFormatted}"
+                                                cardTotal.setTextColor(ContextCompat.getColor(this@CashflowActivity, R.color.greenMoney))
+                                            }
+
+                                            if (cashflow.description == "") cardDesc.text = "No desc"
+                                            else cardDesc.text = "${cashflow.description}"
+
+
+                                            if (cashflow.category != "Income") {
+                                                cardIcon.setImageResource(R.drawable.group)
+                                            }
+
+                                            cashflowCardListContainer.setOnClickListener() {
+                                                val navToEditTransaction = Intent(this@CashflowActivity, EditTransactionActivity::class.java).apply {
+                                                    putExtra("id", cashflow.id)
+                                                    putExtra("total", cashflow.total.toString())
+                                                    putExtra("category", cashflow.category)
+                                                    putExtra("itemCategory", cashflow.itemCategory)
+                                                    putExtra("date", SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(cashflow.date))
+                                                    putExtra("description", cashflow.description)
+                                                    putExtra("type", cashflow.category)
+
+                                                    val userInfoState = getSharedPreferences("auth_prefs", MODE_PRIVATE)
+                                                    val userId = userInfoState.getInt("userId", -1)
+                                                    putExtra("idUser", userId)
+                                                }
+                                                startActivity(navToEditTransaction)
+                                            }
+
+                                            cashflowCardListContainerElement.addView(cashflowCardListContainer)
+
+
+                                        }
+                                    }
+
+
+                                }
+                            }
+                            if (yearMonth == formattedDate) {
+                                filterMonthCard.performClick()
+                            }
+
+                            cashflowFilterSectionView.addView(filterMonthCard)
+                        }
+
+                    }
                 }
+
 
 
 

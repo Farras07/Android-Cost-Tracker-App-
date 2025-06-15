@@ -217,6 +217,17 @@
             </FrameLayout>
 
 
+            <TextView
+                android:id="@+id/infoCardText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No Cashflow Yet"
+                android:textColor="@color/black"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:fontFamily="@font/poppins_regular"
+                android:textStyle="bold"
+                android:layout_marginTop="20sp"/>
 
             <LinearLayout
                 android:id="@+id/cashflowCardContainer"
@@ -224,18 +235,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="5sp">
-
-                <TextView
-                    android:id="@+id/infoCardText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="No Cashflow Yet"
-                    android:textColor="@color/black"
-                    android:textAlignment="center"
-                    android:textSize="20sp"
-                    android:fontFamily="@font/poppins_regular"
-                    android:textStyle="bold"
-                    android:layout_marginTop="20sp"/>
 
             </LinearLayout>
         </LinearLayout>

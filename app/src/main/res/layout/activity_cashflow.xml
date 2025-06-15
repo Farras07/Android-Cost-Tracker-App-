@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppins_semibold"
-                android:text="Cashflow On May"
+                android:text="Detail Cashflow"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="30sp"
@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                app:cardContent="Rp. 1.000.000"
+                app:cardContent="Rp. 0"
                 app:cardContentTextSize="11sp"
                 app:cardIcon="@drawable/wallet"
                 app:cardTitle="Balance"
@@ -64,7 +64,7 @@
                 android:id="@+id/expenseCard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardContent="Rp. 2.000.000"
+                app:cardContent="Rp. 0"
                 app:cardContentTextSize="11sp"
                 app:cardIcon="@drawable/group"
                 app:cardTitle="Expense"
@@ -162,12 +162,25 @@
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <LinearLayout
                     android:id="@+id/cashflowContentContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15sp"
                     android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/infoCardText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="No Cashflow Yet"
+                        android:visibility="gone"
+                        android:textColor="@color/black"
+                        android:textAlignment="center"
+                        android:textSize="20sp"
+                        android:fontFamily="@font/poppins_regular"
+                        android:textStyle="bold"
+                        android:layout_marginTop="20sp"/>
                     <LinearLayout
                         android:id="@+id/mockCardCashflowDateCategoryContainer"
                         android:layout_width="match_parent"

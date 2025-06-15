@@ -38,6 +38,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import com.example.livingcosttracker.ui.home.HeaderInfoUser
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -75,6 +76,15 @@ class MainActivity : AppCompatActivity() {
             startActivity(navToCashflowActivity)  // Start the activity
 
         }
+
+        refreshCashflowData()
+    }
+    override fun onResume() {
+        super.onResume()
+        refreshCashflowData()
+    }
+
+    private fun refreshCashflowData() {
         lifecycleScope.launch {
             val calendar = Calendar.getInstance()
             val converters = Converters()
@@ -150,11 +160,13 @@ class MainActivity : AppCompatActivity() {
             }
             val infoCardText = findViewById<TextView>(R.id.infoCardText)
             val cashflowContainerCards = findViewById<LinearLayout>(R.id.cashflowCardContainer)
+
             val inflater = LayoutInflater.from(this@MainActivity)
             val cashflowList = db.cashflowDao().getAllCashflow().first().reversed()
 
             if (cashflowList.isNotEmpty()) {
                 infoCardText.visibility = View.GONE
+                cashflowContainerCards.removeAllViews()
                 val highlightsCashflow = cashflowList.take(3)
                 highlightsCashflow.forEach { item ->
                     val cardView = inflater.inflate(R.layout.component_card_cashflow, cashflowContainerCards, false)
@@ -205,6 +217,9 @@ class MainActivity : AppCompatActivity() {
 
                     cashflowContainerCards.addView(cardView)
                 }
+            }else {
+                cashflowContainerCards.removeAllViews()
+                infoCardText.visibility = View.VISIBLE
             }
         }
     }
