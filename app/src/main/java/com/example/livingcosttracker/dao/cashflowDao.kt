@@ -57,4 +57,10 @@ interface CashflowDao {
     WHERE itemCategory = :itemCategory
     """)
     suspend fun getCashflowByItemCategories(itemCategory: String): List<Cashflow>
+
+    @Query("""
+        DELETE FROM cashflow
+        WHERE id = :id
+    """)
+    suspend fun deleteCashflowById(id: String)
 }

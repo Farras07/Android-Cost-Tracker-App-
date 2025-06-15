@@ -70,7 +70,8 @@ class RegisterActivity : AppCompatActivity() {
 
             if(user?.id != null) {
                 val navToMain = Intent(this@RegisterActivity, MainActivity::class.java)
-                startActivity(navToMain)  // Start the activity
+                startActivity(navToMain)
+                finish()
             }
 
         }
@@ -131,7 +132,8 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             val navToMain = Intent(this, MainActivity::class.java)
-            startActivity(navToMain)  // Start the activity
+            startActivity(navToMain)
+            finish()
         }
     }
 }
